@@ -1,0 +1,21 @@
+<div class="card album-item mb-4">
+    <div class="card-body p-3">
+        <small *ngIf="albumObj?.albumPhotos!.length >= 0" class="mb-1"><i class="fa-solid fa-images"></i>
+            {{albumObj?.albumPhotos! | numberPhotos}} Photos</small>
+        <h5 class="card-title mb-0">{{albumObj?.title}}</h5>
+        <p class="card-text mt-2">{{albumObj?.description}}</p>
+        <div class="d-flex justify-content-between">
+            <a [routerLink]="['./view', albumObj?.id]" [queryParams]="{id: albumObj?.id}"
+                class="btn view-album w-100">View Album</a>
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a (click)="onSlectAlbum()" class="dropdown-item" [routerLink]="['./edit', albumObj?.id]"
+                            >Edit</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

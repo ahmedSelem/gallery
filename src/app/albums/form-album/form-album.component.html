@@ -1,0 +1,62 @@
+<section class="form-style">
+    <div class="container">
+        <form [formGroup]="submitForm!" (submit)="onSubmit()">
+            <div *ngIf="!isLoading; else isloading"  class="row justify-content-center">
+                <div class="col-12 d-flex justify-content-between py-4 mt-3 border-bottom flex-wrap">
+                    <div class="title-sec">
+                        <h2 class="mb-3 mb-md-0">
+                            <a [routerLink]="['/']" class="me-4">
+                                <i class="fa-solid fa-arrow-left text-dark"></i>
+                            </a>
+                            {{editMode ? 'Edit The Album' : 'Add New Album'}}
+                            
+                        </h2>
+                    </div>
+                    <div class="btn-add text-center">
+                        <button class="btn py-2" [disabled]="!albumEditing ? submitForm!.invalid || filesResult.length == 0 : submitForm!.invalid">Save Album</button>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-4">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input formControlName="title" type="text" class="form-control" id="title">
+                        <div *ngIf="submitForm?.get('title')?.errors && submitForm?.get('title')?.touched"
+                            class="invalid-feedback d-block">
+                            <p *ngIf="submitForm?.get('title')?.getError('required')" class="mb-1">Title is required!
+                            </p>
+                            <p *ngIf="submitForm?.get('title')?.getError('title')" class="mb-1">Max Length is 300
+                                character </p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea formControlName="description" class="form-control" id="description"
+                            rows="3"></textarea>
+                        <div *ngIf="submitForm?.get('description')?.errors && submitForm?.get('description')?.touched"
+                            class="invalid-feedback d-block">
+                            <p *ngIf="submitForm?.get('description')?.getError('required')" class="mb-1">Description is
+                                required!
+                            </p>
+                            <p *ngIf="submitForm?.get('description')?.getError('description')" class="mb-1">Max Length
+                                is 2000 character </p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <upload-dropzone [uploader]="uploader" [options]="options" [onUpdate]="onUpdate"
+                            [height]="height">
+                        </upload-dropzone>
+                    </div>
+                    <div *ngIf="albumEditing" class="row">
+                        <div *ngFor="let img of albumEditing!.albumPhotos" class="col-md-2 mb-3">
+                            <img [src]="img.imageUrl" class="w-100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<ng-template #isloading>
+    <app-loading></app-loading>
+</ng-template>

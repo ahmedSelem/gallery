@@ -1,0 +1,33 @@
+<section class="albums-component">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between py-4 mt-3 border-bottom flex-wrap">
+                <div class="title-sec">
+                    <h2 class="mb-3 mb-md-0">
+                        All Albums
+                    </h2>
+                </div>
+                <div class="btn-add text-center">
+                    <a [routerLink]="['./add']" class="btn py-2">Add Album</a>
+                </div>
+            </div>
+            <div *ngIf="!isLoading; else isloading;" class="col-12 mt-4">
+                <div  *ngIf="albumsList.length > 0; else error" class="row">
+                    <div *ngFor="let album of albumsList" class="col-md-4 col-lg-3">
+                        <app-item [albumObj]="album"></app-item>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #isloading>
+    <app-placeholder></app-placeholder>
+</ng-template>
+
+<ng-template #error>
+    <div class="image-error mt-5 text-center">
+        <img src="../../../assets/images/photo.png" height="350"/>
+    </div>
+</ng-template>

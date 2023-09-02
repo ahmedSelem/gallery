@@ -1,1 +1,51 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+    src: url('assets/fonts/RobotoCondensed-Regular.ttf');
+    font-family: RobotoCondensed;
+}
+
+@font-face {
+    src: url('assets/fonts/Tajawal-Regular.ttf');
+    font-family: Tajawal;
+}
+
+$mainColor: #6c5ce7;
+$mainFont: RobotoCondensed;
+$altFont: Tajawal;
+$border-rad-8: 8px;
+
+
+
+* {
+    font-family: $altFont;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a {
+    font-family: $mainFont;
+}
+
+.btn-add {
+    .btn {
+        border: 1px solid $mainColor;
+        color: $mainColor;
+        border-radius: $border-rad-8;
+        transition: all .3s ease-in;
+        width: 200px;
+        font-size: 20px;
+
+        &:hover {
+            background-color: $mainColor;
+            color: #fff;
+        }
+    }
+}
+
+.title-sec h2 a i {
+    font-size: 20px;
+}

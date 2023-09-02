@@ -1,0 +1,53 @@
+<div class="form-style pb-5">
+    <div class="container">
+        <form [formGroup]="submitForm!" (submit)="onSubmit()">
+            <div class="row justify-content-center">
+                <div class="col-12 d-flex justify-content-between py-4 mt-3 border-bottom flex-wrap">
+                    <div class="title-sec">
+                        <h2 class="mb-3 mb-md-0">
+                            <a [routerLink]="['../']" class="me-4">
+                                <i class="fa-solid fa-arrow-left text-dark"></i>
+                            </a>
+                            {{editMode ? 'Edit The Photo' : 'Add New Photo'}}
+                            
+                        </h2>
+                    </div>
+                    <div class="btn-add text-center">
+                        <button class="btn py-2"
+                            [disabled]="!editMode && filesResult.length == 0">
+                            {{editMode ? 'Save Changes' : 'Save Photo'}}
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-6 mt-4">
+                    <div class="mb-3">
+                        <label for="caption" class="form-label">Caption</label>
+                        <input formControlName="caption" type="text" class="form-control" id="caption">
+                        <div *ngIf="submitForm?.get('caption')?.errors && submitForm?.get('caption')?.touched"
+                            class="invalid-feedback d-block">
+                            <p *ngIf="submitForm?.get('caption')?.getError('required')" class="mb-1">caption is
+                                required!
+                            </p>
+                            <p *ngIf="submitForm?.get('caption')?.getError('caption')" class="mb-1">Max Length is 300
+                                character </p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <upload-dropzone [uploader]="uploader" [options]="options" [onUpdate]="onUpdate"
+                            [height]="height">
+                        </upload-dropzone>
+                        <div class="image-preview">
+                            <img [src]="imageSelect" height="50"/>
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" formControlName="setAlbumCover">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Set as a album cover
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
