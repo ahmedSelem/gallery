@@ -8,22 +8,30 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Uploader, UploadWidgetConfig, UploadWidgetResult } from 'uploader';
+import { Subject, takeUntil } from 'rxjs';
 
 import { AlbumService } from 'src/app/core/services/album.service';
-import {  ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { albumInterface } from 'src/app/core/interfaces/album-interface';
 import { AlbumPhotoInterface } from 'src/app/core/interfaces/album-photo-interface';
-import { Subscription } from 'rxjs';
 import { LoadingComponent } from 'src/app/shared/loading/loading.component';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-form-album',
   standalone: true,
-  imports: [CommonModule, UploaderModule, ReactiveFormsModule, RouterModule, LoadingComponent],
+  imports: [
+    CommonModule,
+    UploaderModule,
+    ReactiveFormsModule,
+    RouterModule,
+    LoadingComponent,
+  ],
   templateUrl: './form-album.component.html',
   styleUrls: ['./form-album.component.scss'],
 })
 export class FormAlbumComponent {
+  destroy = new Subject<void>();
   uploader = Uploader({ apiKey: 'public_W142iDLbbFmk1h9jhPA4oac3tJcj' });
   height = '375px';
   imagesList: AlbumPhotoInterface[] = [];
@@ -32,27 +40,33 @@ export class FormAlbumComponent {
   albumEditing?: albumInterface;
   editMode?: boolean = false;
   isLoading: boolean = false;
-  subscription?: Subscription;
-  
+
   constructor(
     private _albumService: AlbumService,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _loadingService: LoadingService
   ) {}
 
   ngOnInit(): void {
-    this.subscription = this._activatedRoute.params.subscribe((params) => {
-      if(params['id']) {
-        this.editMode = true;
-        this._albumService.albumObjSelect.subscribe((albumSelect) => {
+    this._activatedRoute.params
+      .subscribe((params) => {
+        if (params['id']) {
+          this.editMode = true;
+        }
+      });
+    if (this.editMode) {
+      this._albumService.albumObjSelect
+        .pipe(takeUntil(this.destroy))
+        .subscribe((albumSelect) => {
           this.albumEditing = albumSelect!;
         });
-      }
-    });
+    }
 
-
-    this.subscription = this._albumService.loadingChanged.subscribe((loadingValue)=> {
-      this.isLoading = loadingValue;
-    });
+    this._loadingService.isLoading
+      .pipe(takeUntil(this.destroy))
+      .subscribe((loadingValue) => {
+        this.isLoading = loadingValue;
+      });
 
     this.submitForm = new FormGroup({
       title: new FormControl(
@@ -64,8 +78,6 @@ export class FormAlbumComponent {
         [Validators.required, Validators.maxLength(2000)]
       ),
     });
-
-
   }
 
   options: UploadWidgetConfig = {
@@ -79,7 +91,6 @@ export class FormAlbumComponent {
   };
 
   onSubmit() {
-    this.isLoading = true;
     this.filesResult.map((x) => {
       const imgUrl = x.fileUrl;
       this.imagesList.push({ imageUrl: imgUrl, caption: '' });
@@ -94,7 +105,7 @@ export class FormAlbumComponent {
         title: this.submitForm!.value.title,
         description: this.submitForm!.value.description,
         albumPhotos: PhotosAfterChange,
-        albumCover: PhotosAfterChange[0].imageUrl,
+        albumCover: this.albumEditing.albumCover,
       };
       this._albumService.editAlbum(formData, this.albumEditing.id);
     } else {
@@ -109,6 +120,7 @@ export class FormAlbumComponent {
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy.next();
+    this.destroy.complete();
   }
 }

@@ -6,35 +6,44 @@ import { RouterModule } from '@angular/router';
 import { albumInterface } from 'src/app/core/interfaces/album-interface';
 import { AlbumService } from 'src/app/core/services/album.service';
 import { ItemComponent } from './item/item.component';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-albums-items',
   standalone: true,
   imports: [CommonModule, RouterModule, ItemComponent, PlaceholderComponent],
   templateUrl: './albums-items.component.html',
-  styleUrls: ['./albums-items.component.scss']
+  styleUrls: ['./albums-items.component.scss'],
 })
 export class AlbumsItemsComponent implements OnInit, OnDestroy {
+  destroy = new Subject<void>();
   albumsList: albumInterface[] = [];
   subscription?: Subscription;
   isLoading: boolean = false;
 
-  constructor(private _albumService: AlbumService) {}
+  constructor(
+    private _albumService: AlbumService,
+    private _loadingService: LoadingService
+  ) {}
 
   ngOnInit(): void {
-    this.isLoading = true;
     this._albumService.fetchAlbums();
-    this.subscription = this._albumService.albumChanging.subscribe((albums) => {
-      this.albumsList = albums;
-    });
+    this._albumService.albumChanging
+      .pipe(takeUntil(this.destroy))
+      .subscribe((albums) => {
+        this.albumsList = albums;
+      });
 
-    this.subscription = this._albumService.loadingChanged.subscribe((loadingValue)=> {
-      this.isLoading = loadingValue;
-    })
-
+    this._loadingService.isLoading
+      .pipe(takeUntil(this.destroy))
+      .subscribe((value) => {
+        this.isLoading = value;
+      });
   }
+  
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy.next();
+    this.destroy.complete();
   }
 }

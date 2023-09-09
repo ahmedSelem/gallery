@@ -4,7 +4,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 import { albumInterface } from '../interfaces/album-interface';
 import { ToastService } from './toast.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -19,8 +19,7 @@ export class AlbumService {
   constructor(
     private _httpClient: HttpClient,
     private _toastService: ToastService,
-    private _router: Router,
-    private _activatedRoute: ActivatedRoute
+    private _router: Router
   ) {}
 
   fetchAlbums() {
@@ -30,10 +29,12 @@ export class AlbumService {
         this.albumChanging.next(this.albumsList);
         this.loadingChanged.next(false);
       },
-      error: (_) => {
-        this._toastService.errorShow('Error Has Occurred');
-        this.loadingChanged.next(false);
-      },
+      // error: (_) => {
+      //   this._toastService.errorShow('Error Has Occurred');
+      //   this.loadingChanged.next(false);
+      //   console.log("Error Here !");
+        
+      // },
     });
   }
 
@@ -45,10 +46,10 @@ export class AlbumService {
         this._router.navigate(['./']);
         this.loadingChanged.next(false);
       },
-      error: (_) => {
-        this._toastService.errorShow('Error Has Occurred');
-        this.loadingChanged.next(false);
-      },
+      // error: (_) => {
+      //   this._toastService.errorShow('Error Has Occurred');
+      //   this.loadingChanged.next(false);
+      // },
     });
   }
 
@@ -61,10 +62,10 @@ export class AlbumService {
           this.loadingChanged.next(false);
         }
       },
-      error: (_) => {
-        this._toastService.errorShow('Error Has Occurred');
-        this.loadingChanged.next(false);
-      },
+      // error: (_) => {
+      //   this._toastService.errorShow('Error Has Occurred');
+      //   this.loadingChanged.next(false);
+      // },
     });
   }
 
@@ -77,10 +78,10 @@ export class AlbumService {
           this.loadingChanged.next(false);
 
         },
-        error: (_) => {
-          this._toastService.errorShow('Error Has Occurred');
-         this.loadingChanged.next(false);
-        },
+        // error: (_) => {
+        //   this._toastService.errorShow('Error Has Occurred');
+        //  this.loadingChanged.next(false);
+        // },
       });
   }
 

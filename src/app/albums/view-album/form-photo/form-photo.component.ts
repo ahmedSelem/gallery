@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UploadWidgetConfig, UploadWidgetResult, Uploader } from 'uploader';
 import {
@@ -21,7 +22,8 @@ import { UploaderModule } from 'angular-uploader';
   templateUrl: './form-photo.component.html',
   styleUrls: ['./form-photo.component.scss'],
 })
-export class FormPhotoComponent {
+export class FormPhotoComponent implements OnDestroy{
+  destroy = new Subject<void>();
   uploader = Uploader({ apiKey: 'public_W142iDLbbFmk1h9jhPA4oac3tJcj' });
   height = '375px';
   id?: string;
@@ -49,10 +51,12 @@ export class FormPhotoComponent {
     });
 
     this._albumService.fetchAlbumDetails(this.id!);
-    this._albumService.albumObjSelect.subscribe((album) => {
-      this.album = album!;
-      this.imagesList = this.album?.albumPhotos!;
-    });
+    this._albumService.albumObjSelect
+      .pipe(takeUntil(this.destroy))
+      .subscribe((album) => {
+        this.album = album!;
+        this.imagesList = this.album?.albumPhotos!;
+      });
 
     this.submitForm = new FormGroup({
       caption: new FormControl(this.editMode ? this.album?.title : null, [
@@ -60,7 +64,7 @@ export class FormPhotoComponent {
       ]),
       setAlbumCover: new FormControl(this.isAlbumCover),
     });
-    
+
     if (this.editMode) {
       this.imageSelect = this.album?.albumPhotos[this.imageIndex!].imageUrl;
     }
@@ -73,12 +77,10 @@ export class FormPhotoComponent {
 
   onUpdate = (files: UploadWidgetResult[]) => {
     this.filesResult = files;
-    if (this.editMode) {
-      this.filesResult.map((x) => {
-        const imgUrl = x.fileUrl;
-        this.imageSelect = imgUrl;
-      });
-    }
+    this.filesResult.map((x) => {
+      const imgUrl = x.fileUrl;
+      this.imageSelect = imgUrl;
+    });
   };
 
   onSubmit() {
@@ -101,8 +103,13 @@ export class FormPhotoComponent {
       albumPhotos: this.imagesList,
       albumCover: this.submitForm?.value.setAlbumCover
         ? this.imageSelect
-        :  this.album?.albumCover,
+        : this.album?.albumCover,
     };
     this._albumService.editAlbum(formData, this.id!, 'formPhoto');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
   }
 }
