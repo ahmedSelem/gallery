@@ -41,7 +41,7 @@ export class AlbumsItemsComponent implements OnInit, OnDestroy {
         this.isLoading = value;
       });
   }
-  
+
   ngOnDestroy(): void {
     this.destroy.next();
     this.destroy.complete();
