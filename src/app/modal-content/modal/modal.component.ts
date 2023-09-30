@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import {
@@ -55,7 +55,7 @@ export class ModalComponent implements OnInit {
     });
   }
 
-  populateFormArray(data: any[]) {
+  populateFormArray(data: UserInterface[]) {
     const itemsArray = this.userForm.get('items') as FormArray;
     data.forEach((item) => {
       const group = new FormGroup({
@@ -66,12 +66,19 @@ export class ModalComponent implements OnInit {
     });
   }
 
+  onSubmit() {
+    const userUpdated = this.mergeNewArrToOldArr(
+      this.userForm.value.items,
+      this.users
+    );
+    console.log(userUpdated);
+  }
+
   mergeNewArrToOldArr(
     formArray: any[],
     apiArray: UserInterface[]
   ): UserInterface[] {
     let newArr: UserInterface[] = [];
-
     formArray.forEach((value, index) => {
       const oldValue = apiArray[index];
       const obj = {
@@ -85,20 +92,8 @@ export class ModalComponent implements OnInit {
     return newArr;
   }
 
-  onSubmit() {
-    const userUpdated = this.mergeNewArrToOldArr(
-      this.userForm.value.items,
-      this.users
-    );
-    console.log(userUpdated);
-  }
-
   onClose() {
     this._bsModalRef.hide();
-  }
-
-  preventCollapse(event: Event): void {
-    event.stopPropagation();
   }
 
   // mergeNewArrToOldArr(
